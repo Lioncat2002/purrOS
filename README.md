@@ -5,11 +5,8 @@
  - The code has been test on [Kali Linux](https://www.kali.org/)
  - Have [nasm](https://www.nasm.us/) installed(needed if you are going to modify the code)
  - Have [qemu](https://www.qemu.org/) installed
+ - Have i386-elf-gcc cross compiler installed and set to PATH
  
  ## Run
- - You can run the program using
- `qemu-system-x86_64 boot_sect_simple.bin`
- If you just want to run the provided .bin file</br>
-- If you want to work on it's developement use:
-`nasm -f bin 32bit-main.asm -o boot_sect_simple.bin`
-to compile the assembly code
+ - You can run the program by running the Makefile using
+ `make` in the root directory
