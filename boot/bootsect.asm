@@ -10,12 +10,12 @@ KERNEL_OFFSET equ 0x1000
     call switch_to_pm
     jmp $ ;never executed tho
 
-%include"bootloader/boot_sect_print.asm"
-%include"bootloader/boot_sect_print_hex.asm"
-%include"bootloader/boot_sect_disk.asm"
-%include"bootloader/32bit_gdt.asm"
-%include"bootloader/32bit-print.asm"
-%include"bootloader/32bit-switch.asm"
+%include"boot/boot_sect_print.asm"
+%include"boot/boot_sect_print_hex.asm"
+%include"boot/boot_sect_disk.asm"
+%include"boot/32bit_gdt.asm"
+%include"boot/32bit-print.asm"
+%include"boot/32bit-switch.asm"
 
 [bits 16]
 load_kernel:
