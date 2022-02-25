@@ -1,50 +1,22 @@
-mov ah,0x0e ;tty mode
-mov al,'M'
-int 0x10;insert to the BIOS I think?
+[org 0x7c00];telling assembler our code is to be in bootsector
 
-mov al,'e'
-int 0x10
-
-mov al,'r'
-int 0x10;two times to print the two l
-int 0x10
-
-mov al,'y'
-int 0x10
-
-
-mov al,' '
-int 0x10
-mov al,'C'
-int 0x10
-
-mov al,'h'
-int 0x10
-
-mov al,'r'
-int 0x10
-
-mov al,'i'
-int 0x10
-
-mov al,'s'
-int 0x10
-
-mov al,'t'
-int 0x10
-
-mov al,'m'
-int 0x10
-
-mov al,'a'
-int 0x10
-
-mov al,'s'
-int 0x10
-
-jmp $ ;infinite jump
+mov bp,0x8000
+mov sp,bp
+mov bx,0x9000
+mov dh,2
+call disk_load
+mov dx,[0x9000]
+call print_hex
+call print_nl
+mov dx,[0x9000+512]
+call print_hex
+jmp $ ;jump to current address i.e. infinite loop
+%include "boot_sect_print.asm"
+%include "boot_sect_print_hex.asm"
+%include "boot_sect_disk.asm"
 
 
-; padding and magic number
 times 510-($-$$) db 0
 dw 0xaa55
+times 256 dw 0xdada
+times 256 dw 0xface
