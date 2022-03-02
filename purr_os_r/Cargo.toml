@@ -11,4 +11,5 @@ panic = "abort"
 panic = "abort"
 
 [dependencies]
-bootloader = "0.9.8"
+bootloader = "0.9.8" #we are using the bootloader crate
+volatile = "0.2.6" #to stop erronous optimization of omitting writes
