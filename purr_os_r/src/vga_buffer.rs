@@ -1,5 +1,8 @@
+use core::fmt::{self};
 use volatile::Volatile;
-use core::fmt;
+
+use lazy_static::lazy_static;
+use spin::Mutex;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -54,9 +57,32 @@ pub struct Writer {
 }
 
 impl Writer {
-    fn new_line(&mut self) {}
+    fn clear_row(&mut self, row: usize) {
+        //replacing all the characters with blank space
+        let blank = ScreenChar {
+            ascii_character: b' ',
+            color_code: self.color_code,
+        };
+
+        for col in 0..BUFFER_WIDTH {
+            self.buffer.chars[row][col].write(blank);
+        }
+    }
+
+    fn new_line(&mut self) {
+        for row in 1..BUFFER_HEIGHT {//starting from 1 since the row at 0 will go offscreen
+            for col in 0..BUFFER_WIDTH {
+                //tranfering each character from lower row to the upper
+                let character = self.buffer.chars[row][col].read();
+                self.buffer.chars[row - 1][col].write(character);
+            }
+        }
+        self.clear_row(BUFFER_HEIGHT - 1);//clearing the last row
+        self.column_position = 0;
+    }
 
     pub fn write_byte(&mut self, byte: u8) {
+        //match bytes for newline and ascii characters
         match byte {
             b'\n' => self.new_line(),
             byte => {
@@ -88,22 +114,37 @@ impl Writer {
     }
 }
 
-impl fmt::Write for Writer{
-    fn write_str(&mut self,s:&str)->fmt::Result{
+impl fmt::Write for Writer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
         self.write_string(s);
         Ok(())
     }
 }
 
-pub fn write_smthing() {
-    use core::fmt::Write;
-    let mut writer = Writer {
+lazy_static! {
+    //using spin lock "mutex" to wait till the thread is free
+    pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
         column_position: 0,
         color_code: ColorCode::new(Color::Yellow, Color::Black),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
-    };
-    writer.write_byte(b'H');
-    writer.write_string("ello ");
-    writer.write_string("World!\n");
-    write!(writer,"The 2 numbers are {} and {}", 42,1.0/3.0).unwrap();
+    });
+}
+
+#[macro_export]
+macro_rules! print {
+    //print macro
+    ($($arg:tt)*) => ($crate::vga_buffer::_print(format_args!($($arg)*)));
+}
+
+#[macro_export]
+macro_rules! println {
+    //println macro
+    ()=>($crate::print!("\n"));
+    ($($arg:tt)*) => ($crate::print!("{}\n",format_args!($($arg)*)));
+}
+
+#[doc(hidden)]//we don't want Docs for this function :p
+pub fn _print(args: fmt::Arguments) {
+    use core::fmt::Write;
+    WRITER.lock().write_fmt(args).unwrap();
 }
