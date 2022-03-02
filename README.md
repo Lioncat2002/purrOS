@@ -1,12 +1,13 @@
 # purrOS-reboot
- A simple OS I am writing
+ A simple OS I am writing<br>
+ THis branch has been written in Rust
  
  ## Prerequistics
- - The code has been test on [Kali Linux](https://www.kali.org/)
- - Have [nasm](https://www.nasm.us/) installed(needed if you are going to modify the code)
- - Have [qemu](https://www.qemu.org/) installed
- - Have i386-elf-gcc cross compiler installed and set to PATH
+- Code has been tested on windows(some changes might be needed for the code to run on linux and Mac)
+- Have Rust 2018 nightly installed
+- bootimage crate installed
+- qemu installed and added to PATH
  
  ## Run
- - You can run the program by running the Makefile using
- `make` in the root directory
+ - Run `cargo run`
+ - This will open up the OS onto qemu
