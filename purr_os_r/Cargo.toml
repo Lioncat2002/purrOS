@@ -8,8 +8,14 @@ edition = "2018"
 bootloader = "0.9.8" #we are using the bootloader crate
 volatile = "0.2.6" #to stop erronous optimization of omitting writes
 spin = "0.5.2" #spin lock to lock the process till thread is available:  https://en.wikipedia.org/wiki/Spinlock
-
+x86_64 = "0.14.2" #for making assembly calls
+uart_16550 = "0.2.0" #serial port crate for sending data from the kernel to the terminal from qemu
 
 [dependencies.lazy_static]
 version = "1.0"
 features = ["spin_no_std"]
+
+[package.metadata.bootimage]
+test-args = ["-device", "isa-debug-exit,iobase=0xf4,iosize=0x04","-serial", "stdio","-display","none"]
+test-success-exit-code = 33         # (0x10 << 1) | 1
+test-timeout = 60 #Exits qemu after a certain time(s) TODO:set it to 300 when we start the real work
